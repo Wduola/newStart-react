@@ -91,7 +91,7 @@ module.exports = {
   // ---------------------- 五、自动化：开发服务器
   devServer: {
     contentBase: resolve("public"), //开发服务器将哪个文件暴露出去
-    port: 9527,
+    port: 8888,
     host: "localhost",
     compress: true, //压缩
     open: true,

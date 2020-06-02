@@ -1,52 +1,42 @@
-// 应用主组件
-import React from "react";
+/*
+ 应用主组件
+*/
+import React, { Component } from "react";
 
-// 引入组件
 import Header from "./pages/Header";
-import List from "./pages/List";
 import Footer from "./pages/Footer";
-import Modal from "./pages/Modal";
+import List from "./pages/List";
 
-// 引入样式
+// 引入样式文件 --> 为了让webpack打包它
 import "./App.css";
 
-// ES6类定义组件
-class App extends React.Component {
-  // 设置初始化状态state
+class App extends Component {
+  // 初始化状态
   state = {
     todos: [
       { id: 1, name: "吃饭", isCompleted: false },
       { id: 2, name: "睡觉", isCompleted: false },
     ],
-    visible: false,
   };
-  // 设置删除
-  handleDel = () => {
-    if (this.props.visible) {
-      this.setState({
-        visible: false,
-      });
-      this.props.delCompletedTodos();
-    }
-  };
-  // id初始值
+
   id = 3;
-  // 收集数据
+
+  // 状态数据定义在哪，更新状态数据的方法就应该定义在哪？
   addTodo = (name) => {
-    // 读取之前的todos里面的数据
+    // 之前的数据
     const { todos } = this.state;
-    // 更新state
     this.setState({
+      // 必须要保证更新的数据是一个全新数据（不能push unshift）
       todos: [{ id: this.id++, name, isCompleted: false }, ...todos],
     });
   };
-  // 更新列表组件
+
   updateTodo = (id, isCompleted) => {
-    // 读取state数据
     const { todos } = this.state;
-    // 更新state数据
+
     this.setState({
       todos: todos.map((todo) => {
+        // map既能更新数组中所有值，也能只更新指定值
         if (todo.id === id) {
           return {
             id: todo.id,
@@ -58,19 +48,14 @@ class App extends React.Component {
       }),
     });
   };
-  // 删除一项
-  delTodo = (id) => {
-    this.setState({
-      todos: this.state.todos.filter((todo) => {
-        return todo.id !== id;
-      }),
-    });
-  };
-  // 全选
+
   checkAll = (isCheckAll) => {
     const { todos } = this.state;
+    console.log(isCheckAll);
+
     this.setState({
       todos: todos.map((todo) => {
+        // map既能更新数组中所有值，也能只更新指定值
         return {
           id: todo.id,
           name: todo.name,
@@ -79,7 +64,18 @@ class App extends React.Component {
       }),
     });
   };
-  //
+
+  delTodo = (id) => {
+    this.setState({
+      // 不能修改原数据，要返回一个全新的数据（React中的特点）
+      // 所有修改原数据的方法都不可以用，splice、push、unshift
+      todos: this.state.todos.filter((todo) => {
+        // 返回true保留 返回false过滤
+        return todo.id !== id;
+      }),
+    });
+  };
+
   delCompletedTodos = () => {
     this.setState({
       todos: this.state.todos.filter((todo) => {
@@ -87,26 +83,37 @@ class App extends React.Component {
       }),
     });
   };
+
   render() {
     // 读取state
     const { todos } = this.state;
-    // 计算总数
+
+    // 计算：总数
     const allCount = todos.length;
-    // 计算已经完成的数
+    // 已完成数量
     const completedCount = todos.reduce((p, c) => {
       return p + (c.isCompleted ? 1 : 0);
     }, 0);
+
     return (
       <div className="todo-container">
         <div className="todo-wrap">
           <Header addTodo={this.addTodo} />
-          <List todos={todos} updateTodo={this.updateTodo} delTodo={this.delTodo} />
-          <Footer checkAll={this.checkAll} allCount={allCount} delCompletedTodos={this.delCompletedTodos} completedCount={completedCount} handleDel={this.handleDel} />
+          <List
+            todos={todos}
+            updateTodo={this.updateTodo}
+            delTodo={this.delTodo}
+          />
+          <Footer
+            allCount={allCount}
+            completedCount={completedCount}
+            checkAll={this.checkAll}
+            delCompletedTodos={this.delCompletedTodos}
+          />
         </div>
       </div>
     );
   }
 }
 
-// 默认暴露
 export default App;
